@@ -210,7 +210,7 @@ class ReclientConfigurator:
 
         # Use scandeps_server.
         depsscanner_address = (f'exec://{Paths.src_dir}/'
-                            'buildtools/reclient/scandeps_server')
+                               'buildtools/reclient/scandeps_server')
         if sys.platform.startswith('win'):
             depsscanner_address += '.exe'
         reproxy_cfg['depsscanner_address'] = depsscanner_address
@@ -277,24 +277,24 @@ class Paths:
 
     @classmethod
     def init_from_args(cls, args):
-        cls.script_dir = cls._create_path(os.path.dirname(__file__),
-                                          'script_dir')
-        cls.src_dir = cls._create_path(args.src_dir, 'src_dir')
-        cls.exec_root = cls._create_path(args.exec_root or cls.exec_root,
-                                         'exec_root')
-        cls.build_dir = cls._create_path(args.build_dir or cls.build_dir,
-                                         'build_dir')
-        cls.reclient_cfgs_dir = cls._create_path(
+        cls.script_dir = cls.create_path(os.path.dirname(__file__),
+                                         'script_dir')
+        cls.src_dir = cls.create_path(args.src_dir, 'src_dir')
+        cls.exec_root = cls.create_path(args.exec_root or cls.exec_root,
+                                        'exec_root')
+        cls.build_dir = cls.create_path(args.build_dir or cls.build_dir,
+                                        'build_dir')
+        cls.reclient_cfgs_dir = cls.create_path(
             args.reclient_cfgs_dir or cls.reclient_cfgs_dir,
             'reclient_cfgs_dir')
-        cls.clang_base_path = cls._create_path(
+        cls.clang_base_path = cls.create_path(
             args.clang_base_path or cls.clang_base_path, 'clang_base_path')
-        cls.linux_clang_base_path = cls._create_path(
+        cls.linux_clang_base_path = cls.create_path(
             args.linux_clang_base_path or cls.linux_clang_base_path,
             'linux_clang_base_path')
 
         if args.custom_py:
-            cls.custom_py = cls._create_path(args.custom_py, 'custom_py')
+            cls.custom_py = cls.create_path(args.custom_py, 'custom_py')
 
         # Ensure some dirs are a part of exec_root.
         exec_root_included_dirs = (
@@ -309,7 +309,7 @@ class Paths:
                 cls.exec_root), f'{directory} should be under {cls.exec_root}'
 
     @classmethod
-    def _create_path(cls, path, path_var):
+    def create_path(cls, path, path_var):
         path = cls.abspath(path.format(**cls._path_vars))
         if path_var:
             cls._path_vars[path_var] = path
@@ -352,6 +352,35 @@ class Paths:
 
 ### Reclient config manipulation helpers. ###
 class ReclientCfg:
+    # Key-Value params in reclient cfg.
+    KEY_VALUE_PARAMS = {
+        'labels',
+        'platform',
+    }
+
+    # List params in reclient cfg.
+    LIST_PARAMS = {
+        'env_var_allowlist',
+        'input_list_paths',
+        'inputs',
+        'output_list_paths',
+        'output_files',
+        'output_directories',
+        'toolchain_inputs',
+    }
+
+    # Maps rewrapper parameters to the directories they should be relative to.
+    PATHS_RELATIVE_TO = {
+        'input_list_paths': '{exec_root}',
+        'inputs': '{exec_root}',
+        'output_files': '{exec_root}',
+        'output_list_paths': '{exec_root}',
+        'output_directories': '{exec_root}',
+        'toolchain_inputs': '{exec_root}',
+        'local_wrapper': '{build_dir}',
+        'remote_wrapper': '{build_dir}',
+    }
+
     @classmethod
     def parse_from_file(cls, cfg_path):
         return dict(cls.enumerate_from_file(cfg_path))
@@ -399,21 +428,7 @@ class ReclientCfg:
 
     @classmethod
     def from_cfg_value(cls, key, value):
-        KEY_VALUE_PARAMS = {
-            'labels',
-            'platform',
-        }
-        LIST_PARAMS = {
-            'env_var_allowlist',
-            'input_list_paths',
-            'inputs',
-            'output_list_paths',
-            'output_files',
-            'output_directories',
-            'toolchain_inputs',
-        }
-
-        if key in KEY_VALUE_PARAMS:
+        if key in cls.KEY_VALUE_PARAMS:
             ret_val = {}
             for sub_kv in value.split(','):
                 if not sub_kv:
@@ -424,7 +439,7 @@ class ReclientCfg:
                 ret_val[sub_key] = sub_value
             return ret_val
 
-        if key in LIST_PARAMS:
+        if key in cls.LIST_PARAMS:
             if not value:
                 return []
             return value.split(',')
@@ -451,22 +466,10 @@ class ReclientCfg:
 
     @classmethod
     def rebase_if_path_value(cls, key, value):
-        # Describes relative to what each rewrapper parameter should be in the
-        # config.
-        PATHS_RELATIVE_TO = {
-            'input_list_paths': Paths.exec_root,
-            'inputs': Paths.exec_root,
-            'output_files': Paths.exec_root,
-            'output_list_paths': Paths.exec_root,
-            'output_directories': Paths.exec_root,
-            'toolchain_inputs': Paths.exec_root,
-            'local_wrapper': Paths.build_dir,
-            'remote_wrapper': Paths.build_dir,
-        }
-
-        relative_to = PATHS_RELATIVE_TO.get(key)
+        relative_to = cls.PATHS_RELATIVE_TO.get(key)
         if relative_to:
             value = Paths.format(value)
+            relative_to = Paths.format(relative_to)
             if os.path.isabs(value):
                 value = Paths.relpath(value, relative_to)
 

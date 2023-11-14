@@ -47,9 +47,8 @@ remotely.
 ### Config merge process
 
 1. Parse a config item and merge it with the existing one or create a new one.
-2. If the value is a map, overwrite map items; if it's a list, append
-   list items. Map-like and list-like items are hardcoded in
-   `ReclientCfg.from_cfg_value()`.
+2. If the value is a map, overwrite map items; if it's a list, append list
+   items. Map-like and list-like items are hardcoded in `ReclientCfg`.
 3. If the value is empty, clear the item.
 
 This allows config merger to perform such modifications:
@@ -77,15 +76,14 @@ inputs=src/a_single_input
 ### Path substitution
 
 Configs may use path placeholders such as `{src_dir}`, `{build_dir}` in some
-variables of rewrapper configs. See `ReclientCfg.rebase_if_path_value()` for the
-full list of supported variables.
+variables of rewrapper configs. See `ReclientCfg` for the full list of supported
+variables.
 
 Available placeholders can be found in `Paths` helper declaration. These
 placeheolders are substituted and final values are rebased onto
-Reclient-expected directory during the config write stage (see
-`ReclientCfg.rebase_if_path_value()`).
+Reclient-expected directory during the config write stage (see `ReclientCfg`).
 
-### Cusomization via external py script
+### Customization via external py script
 
 You can pass a custom python script via `--custom_py` that may alter reproxy and
 rewrapper configs. The script receives some global objects from the configurator
@@ -93,9 +91,19 @@ to make config handling easier (see `ReclientConfigurator.load_custom_py()`). It
 may implement some of these functions to be called by the configurator.
 
 ```(python)
+# Injected by reclient configurator.
+Paths: object
+ReclientCfg: object
+FileUtils: object
+ShellTemplate: object
+
+
 # Called before the configuration begins.
 def pre_configure():
-    pass
+    # Example: do not make remote_wrapper parameter relative. This is usable if
+    # you run a custom Docker image with a baked-in wrapper which should be
+    # called via absolute path.
+    ReclientCfg.PATHS_RELATIVE_TO.pop('remote_wrapper')
 
 
 # Called before writing reproxy.cfg.

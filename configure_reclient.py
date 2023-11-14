@@ -379,8 +379,8 @@ class ReclientCfg:
         assert isinstance(cfg, dict)
         cfg_to_write = FileUtils.create_generated_header(
             source_cfg_paths) + '\n\n'
-        for key, value in cfg.items():
-            formatted_value = cls.to_cfg_value(key, value)
+        for key in sorted(cfg.keys()):
+            formatted_value = cls.to_cfg_value(key, cfg[key])
             if formatted_value:
                 cfg_to_write += f'{formatted_value}\n'
 

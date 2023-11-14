@@ -319,8 +319,7 @@ class Paths:
         )
         for directory in exec_root_included_dirs:
             assert directory.startswith(
-                cls.exec_root
-            ), f'{directory} should be a part of {cls.exec_root}'
+                cls.exec_root), f'{directory} should be under {cls.exec_root}'
 
     @classmethod
     def _create_path(cls, path, path_var):

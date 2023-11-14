@@ -215,19 +215,6 @@ class ReclientConfigurator:
             depsscanner_address += '.exe'
         reproxy_cfg['depsscanner_address'] = depsscanner_address
 
-        # Set values from supported RBE_ environment variables.
-        SUPPORTED_REPROXY_ENV_VARS = (
-            'RBE_service',
-            'RBE_service_no_auth',
-            'RBE_tls_client_auth_cert',
-            'RBE_tls_client_auth_key',
-            'RBE_use_application_default_credentials',
-        )
-        for env_var in SUPPORTED_REPROXY_ENV_VARS:
-            value = os.environ.get(env_var)
-            if value:
-                reproxy_cfg[env_var[4:]] = value
-
         # Launch a custom merge step if it exists.
         if self.custom_py and 'merge_reproxy_cfg' in self.custom_py:
             reproxy_cfg = self.custom_py['merge_reproxy_cfg'](reproxy_cfg)

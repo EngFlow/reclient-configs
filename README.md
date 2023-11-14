@@ -30,7 +30,6 @@ Reproxy config is based on the Chromium config template.
    `//buildtools/reclient_cfgs/reproxy_cfg_templates/reproxy.cfg.template` with
    empty variables.
 2. Merge `reproxy.cfg`.
-3. Set auth-specific vars from `RBE_*` environment variables if they are set.
 
 #### Rewrapper configs merge
 

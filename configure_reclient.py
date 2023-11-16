@@ -193,12 +193,14 @@ class ReclientConfigurator:
     def generate_reproxy_cfg(self):
         # Load Chromium config template and remove everything starting with $
         # symbol on each line.
+        reproxy_template_fname = 'reproxy_cfg_templates/reproxy.cfg.template'
+        reproxy_template_file = f'{Paths.reclient_cfgs_dir}/{reproxy_template_fname}'
+        if not FileUtils.exists(reproxy_template_file):
+            reproxy_template_file = f'{Paths.script_dir}/{reproxy_template_fname}'
         reproxy_cfg = ReclientCfg.parse_from_string(
             re.sub(r'^([^$]+)\$.*$',
                    r'\1',
-                   FileUtils.read_text_file(
-                       f'{Paths.reclient_cfgs_dir}/reproxy_cfg_templates/'
-                       'reproxy.cfg.template'),
+                   FileUtils.read_text_file(reproxy_template_file),
                    flags=re.MULTILINE))
 
         # Merge with our config.
@@ -225,21 +227,17 @@ class ReclientConfigurator:
                                   reproxy_cfg, source_cfg_paths)
 
     def generate_rewrapper_cfgs(self):
-        # Generate chromium-browser-clang configs.
-        self.generate_rewrapper_cfg('chromium-browser-clang', 'linux')
-        self.generate_rewrapper_cfg('chromium-browser-clang', 'mac')
-        self.generate_rewrapper_cfg('chromium-browser-clang', 'windows')
-
-        # Generate python configs.
-        self.generate_rewrapper_cfg('python', 'linux')
-        self.generate_rewrapper_cfg('python', 'mac')
-        self.generate_rewrapper_cfg('python', 'windows')
+        for tool in ['chromium-browser-clang', 'python']:
+            for platform in ['linux', 'mac', 'windows']:
+                self.generate_rewrapper_cfg(tool, platform)
 
     def generate_rewrapper_cfg(self, tool, host_os):
         # Load Chromium config for linux remote.
-        rewrapper_cfg = ReclientCfg.parse_from_file(
-            f'{Paths.reclient_cfgs_dir}/linux/{tool}/'
-            f'rewrapper_linux.cfg')
+        rewrapper_cfg_fname = f'linux/{tool}/rewrapper_linux.cfg'
+        rewrapper_cfg_file = f'{Paths.reclient_cfgs_dir}/{rewrapper_cfg_fname}'
+        if not FileUtils.exists(rewrapper_cfg_file):
+            rewrapper_cfg_file = f'{Paths.script_dir}/{rewrapper_cfg_fname}'
+        rewrapper_cfg = ReclientCfg.parse_from_file(rewrapper_cfg_file)
 
         # Merge with our configs.
         source_cfg_paths = [
@@ -508,6 +506,10 @@ class FileUtils:
     {source_files}
     # And rerun configurator.
     ''')
+
+    @classmethod
+    def exists(cls, filepath):
+        return os.path.isfile(filepath)
 
     @classmethod
     def read_text_file(cls, filepath):

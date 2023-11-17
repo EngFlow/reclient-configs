@@ -195,7 +195,7 @@ class ReclientConfigurator:
         # symbol on each line.
         reproxy_template_fname = 'reproxy_cfg_templates/reproxy.cfg.template'
         reproxy_template_file = f'{Paths.reclient_cfgs_dir}/{reproxy_template_fname}'
-        if not FileUtils.exists(reproxy_template_file):
+        if not os.path.isfile(reproxy_template_file):
             reproxy_template_file = f'{Paths.script_dir}/{reproxy_template_fname}'
         reproxy_cfg = ReclientCfg.parse_from_string(
             re.sub(r'^([^$]+)\$.*$',
@@ -235,7 +235,7 @@ class ReclientConfigurator:
         # Load Chromium config for linux remote.
         rewrapper_cfg_fname = f'linux/{tool}/rewrapper_linux.cfg'
         rewrapper_cfg_file = f'{Paths.reclient_cfgs_dir}/{rewrapper_cfg_fname}'
-        if not FileUtils.exists(rewrapper_cfg_file):
+        if not os.path.isfile(rewrapper_cfg_file):
             rewrapper_cfg_file = f'{Paths.script_dir}/{rewrapper_cfg_fname}'
         rewrapper_cfg = ReclientCfg.parse_from_file(rewrapper_cfg_file)
 
@@ -506,10 +506,6 @@ class FileUtils:
     {source_files}
     # And rerun configurator.
     ''')
-
-    @classmethod
-    def exists(cls, filepath):
-        return os.path.isfile(filepath)
 
     @classmethod
     def read_text_file(cls, filepath):

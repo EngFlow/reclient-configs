@@ -14,12 +14,15 @@
 # limitations under the License.
 
 import argparse
-import os
 import subprocess
 import sys
 import tempfile
 
 from configure_reclient import Paths
+
+
+DOCKER_IMAGE = 'docker://docker.io/library/debian@sha256:82bab30ed448b8e2509aabe21f40f0607d905b7fd0dec72802627a20274eba55'
+
 
 def main():
     Paths.init_from_args(parse_args())
@@ -32,7 +35,8 @@ def parse_args():
     parser.add_argument(
         '--src_dir',
         help='Chromium src directory.',
-        default=os.getcwd(),
+        required=True,
+        default=argparse.SUPPRESS,
     )
     parser.add_argument(
         '--reclient_cfgs_dir',
@@ -46,8 +50,6 @@ def parse_args():
     )
     return parser.parse_args()
 
-
-DOCKER_IMAGE = 'docker://docker.io/library/debian@sha256:82bab30ed448b8e2509aabe21f40f0607d905b7fd0dec72802627a20274eba55'
 
 def check_reclient_works():
     print('Starting reproxy')

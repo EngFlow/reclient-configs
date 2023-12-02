@@ -275,6 +275,7 @@ class Paths:
     exec_root = '{src_dir}'
     build_dir = '{src_dir}/out/a'
     reclient_cfgs_dir = '{src_dir}/buildtools/reclient_cfgs'
+    reclient_dir = '{src_dir}/buildtools/reclient'
     clang_base_path = '{src_dir}/third_party/llvm-build/Release+Asserts'
     linux_clang_base_path = '{clang_base_path}_linux'
 
@@ -287,20 +288,19 @@ class Paths:
         cls.script_dir = cls.create_path(os.path.dirname(__file__),
                                          'script_dir')
         cls.src_dir = cls.create_path(args.src_dir, 'src_dir')
-        cls.exec_root = cls.create_path(args.exec_root or cls.exec_root,
-                                        'exec_root')
-        cls.build_dir = cls.create_path(args.build_dir or cls.build_dir,
-                                        'build_dir')
-        cls.reclient_cfgs_dir = cls.create_path(
-            args.reclient_cfgs_dir or cls.reclient_cfgs_dir,
-            'reclient_cfgs_dir')
-        cls.clang_base_path = cls.create_path(
-            args.clang_base_path or cls.clang_base_path, 'clang_base_path')
-        cls.linux_clang_base_path = cls.create_path(
-            args.linux_clang_base_path or cls.linux_clang_base_path,
-            'linux_clang_base_path')
+        computed_args = [
+            'exec_root',
+            'build_dir',
+            'reclient_cfgs_dir',
+            'reclient_dir',
+            'clang_base_path',
+            'linux_clang_base_path',
+        ]
+        for arg in computed_args:
+            value = getattr(args, arg) if hasattr(args, arg) else None
+            setattr(cls, arg, cls.create_path(value or getattr(cls, arg), arg))
 
-        if args.custom_py:
+        if hasattr(args, 'custom_py') and args.custom_py:
             cls.custom_py = cls.create_path(args.custom_py, 'custom_py')
 
         # Ensure some dirs are a part of exec_root.

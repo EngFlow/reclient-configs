@@ -86,6 +86,11 @@ def parse_args():
         help='Configure reclient even if RBE_service env var is not set.',
         action='store_true',
     )
+    parser.add_argument(
+        '--verbose',
+        help='Prints out files modified.',
+        action='store_true',
+    )
 
     return parser.parse_args()
 
@@ -149,8 +154,7 @@ class ReclientConfigurator:
             'linux',
         ])
 
-    @staticmethod
-    def generate_clang_remote_wrapper():
+    def generate_clang_remote_wrapper(self):
         if not os.path.exists(Paths.clang_base_path):
             raise RuntimeError(f'Cannot find {Paths.clang_base_path}.')
 
@@ -195,6 +199,8 @@ class ReclientConfigurator:
             clang_remote_wrapper_template).substitute(template_vars)
 
         # Write the clang remote wrapper.
+        if self.args.verbose:
+            print(f'Writing {Paths.src_dir}/buildtools/reclient_cfgs/chromium-browser-clang/clang_remote_wrapper')
         FileUtils.write_text_file(
             (f'{Paths.src_dir}/buildtools/reclient_cfgs/chromium-browser-clang/'
              'clang_remote_wrapper'), clang_remote_wrapper)
@@ -232,6 +238,8 @@ class ReclientConfigurator:
             source_cfg_paths.append(Paths.custom_py)
 
         # Write the final config to the expected location.
+        if self.args.verbose:
+            print(f'Writing {Paths.reclient_cfgs_dir}/reproxy.cfg')
         ReclientCfg.write_to_file(f'{Paths.reclient_cfgs_dir}/reproxy.cfg',
                                   reproxy_cfg, source_cfg_paths)
 
@@ -264,6 +272,8 @@ class ReclientConfigurator:
             source_cfg_paths.append(Paths.custom_py)
 
         # Write the final config to the expected location.
+        if self.args.verbose:
+            print(f'Writing {Paths.reclient_cfgs_dir}/{tool}/rewrapper_{host_os}.cfg')
         ReclientCfg.write_to_file(
             f'{Paths.reclient_cfgs_dir}/{tool}/rewrapper_{host_os}.cfg',
             rewrapper_cfg, source_cfg_paths)

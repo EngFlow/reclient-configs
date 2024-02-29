@@ -146,7 +146,7 @@ class ReclientConfigurator:
     @staticmethod
     def download_linux_clang_toolchain():
         subprocess.check_call([
-            'python3',
+            sys.executable,
             f'{Paths.src_dir}/tools/clang/scripts/update.py',
             '--output-dir',
             f'{Paths.linux_clang_base_path}',

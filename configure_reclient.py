@@ -252,6 +252,11 @@ class ReclientConfigurator:
         for tool in ['chromium-browser-clang', 'python', 'nacl']:
             for platform in ['linux', 'mac', 'windows']:
                 self.generate_rewrapper_cfg(tool, platform)
+        
+        for platform in ['linux', 'mac', 'windows']:
+            self.generate_rewrapper_cfg(tool, platform)
+            if self.args.large_pool_name:
+                self.generate_rewrapper_large_cfg('python', platform)
 
     def generate_rewrapper_cfg(self, tool, host_os):
         # Load Chromium config for linux remote.
@@ -266,12 +271,6 @@ class ReclientConfigurator:
             f'{Paths.script_dir}/{tool}/rewrapper_base.cfg',
             f'{Paths.script_dir}/{tool}/rewrapper_{host_os}.cfg',
         ]
-        if self.args.large_pool_name and tool == 'python':
-            # commented lines below as the files with suffix _large.cfg do not exist so we get a runtime error
-            # source_cfg_paths = source_cfg_paths + [
-            #    f'{Paths.script_dir}/{tool}/rewrapper_{host_os}_large.cfg',
-            # ]
-            rewrapper_cfg['platform=Pool'] = self.args.large_pool_name
 
         for source_cfg_path in source_cfg_paths:
             rewrapper_cfg = ReclientCfg.merge_cfg(rewrapper_cfg,
@@ -290,6 +289,29 @@ class ReclientConfigurator:
             f'{Paths.reclient_cfgs_dir}/{tool}/rewrapper_{host_os}.cfg',
             rewrapper_cfg, source_cfg_paths)
 
+    def generate_rewrapper_large_cfg(self, tool, host_os):
+        # Load Chromium config for linux remote.
+        rewrapper_cfg_fname = f'linux/{tool}/rewrapper_linux_large.cfg'
+        rewrapper_cfg_file = f'{Paths.reclient_cfgs_dir}/{rewrapper_cfg_fname}'
+        if not os.path.isfile(rewrapper_cfg_file):
+            rewrapper_cfg_file = f'{Paths.script_dir}/{rewrapper_cfg_fname}'
+        rewrapper_cfg = ReclientCfg.parse_from_file(rewrapper_cfg_file)
+
+        # Merge with our configs.
+        source_cfg_paths = [
+            f'{Paths.script_dir}/{tool}/rewrapper_{host_os}_large.cfg',
+        ]
+        rewrapper_cfg['platform=Pool'] = self.args.large_pool_name
+        for source_cfg_path in source_cfg_paths:
+            rewrapper_cfg = ReclientCfg.merge_cfg(rewrapper_cfg,
+                                                  source_cfg_path)
+
+        # Write the final config to the expected location.
+        if self.args.verbose:
+            print(f'Writing {Paths.reclient_cfgs_dir}/{tool}/rewrapper_{host_os}_large.cfg')
+        ReclientCfg.write_to_file(
+            f'{Paths.reclient_cfgs_dir}/{tool}/rewrapper_{host_os}_large.cfg',
+            rewrapper_cfg, source_cfg_paths)
 
 class Paths:
     script_dir = ''
@@ -555,7 +577,6 @@ class FileUtils:
         filepath_new = filepath + '.new'
         with open(filepath_new, 'w', newline='\n') as f:
             f.write(data_to_write)
-
         shutil.move(filepath_new, filepath)
 
     @classmethod

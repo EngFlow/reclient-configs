@@ -146,11 +146,15 @@ def post_configure():
 
 ### Define large pool
 
-Chromium now uses a large pool to run actions that might otherwise run into
-OOM (b/325844324). See [Reclient](https://source.chromium.org/chromium/chromium/src/+/4f94ce92c8c657cbfeb4dd386581340704c9dd11).
+Chromium now supports running actions on a different worker pool that might otherwise run into
+an OOM. See [Reclient](https://source.chromium.org/chromium/chromium/src/+/4f94ce92c8c657cbfeb4dd386581340704c9dd11).
 
-You an define the name of the large pool by passing the following flag when running the tool:
+The actions affected are currently only Python actions marked with `remote_worker=large`.
+
+You can define the name of the large pool by passing the following flag when running the tool:
 
 ```
 python3 configure_reclient.py --large_pool_name=<NAME_OF_LARGE_POOL>
 ```
+
+By default, these actions will use the default worker pool, same as other actions.

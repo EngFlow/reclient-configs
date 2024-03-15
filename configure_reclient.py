@@ -266,7 +266,8 @@ class ReclientConfigurator:
             f'{Paths.script_dir}/{tool}/rewrapper_base.cfg',
             f'{Paths.script_dir}/{tool}/rewrapper_{host_os}.cfg',
         ]
-        if self.args.large_pool_name:
+        if self.args.large_pool_name and tool == 'python':
+            # commented lines below as the files with suffix _large.cfg do not exist so we get a runtime error
             # source_cfg_paths = source_cfg_paths + [
             #    f'{Paths.script_dir}/{tool}/rewrapper_{host_os}_large.cfg',
             # ]

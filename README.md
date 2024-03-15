@@ -143,3 +143,14 @@ def merge_rewrapper_cfg(rewrapper_cfg, tool, host_os):
 def post_configure():
     pass
 ```
+
+### Define large pool
+
+Chromium now uses a large pool to run actions that might otherwise run into
+OOM (b/325844324). See [Reclient](https://source.chromium.org/chromium/chromium/src/+/4f94ce92c8c657cbfeb4dd386581340704c9dd11).
+
+You an define the name of the large pool by passing the following flag when running the tool:
+
+```
+python3 configure_reclient.py --large_pool_name=<NAME_OF_LARGE_POOL>
+```

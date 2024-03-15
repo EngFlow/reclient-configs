@@ -301,7 +301,7 @@ class ReclientConfigurator:
             f'{Paths.script_dir}/{tool}/rewrapper_{host_os}_large.cfg',
         ]
         if self.args.large_pool_name:
-            rewrapper_cfg['platform']['pool'] = self.args.large_pool_name
+            rewrapper_cfg['platform']['Pool'] = self.args.large_pool_name
         for source_cfg_path in source_cfg_paths:
             rewrapper_cfg = ReclientCfg.merge_cfg(rewrapper_cfg,
                                                   source_cfg_path)
@@ -485,7 +485,7 @@ class ReclientCfg:
                 if not sub_kv:
                     continue
                 if '=' not in sub_kv:
-                    raise RuntimeError(f'key=value expected for key: {key}')
+                    raise RuntimeError(f'key=value expected for key: {key}, got {value}')
                 sub_key, sub_value = sub_kv.split('=', 1)
                 ret_val[sub_key] = sub_value
             return ret_val

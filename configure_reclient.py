@@ -254,9 +254,7 @@ class ReclientConfigurator:
                 self.generate_rewrapper_cfg(tool, platform)
         
         for platform in ['linux', 'mac', 'windows']:
-            self.generate_rewrapper_cfg(tool, platform)
-            if self.args.large_pool_name:
-                self.generate_rewrapper_large_cfg('python', platform)
+            self.generate_rewrapper_large_cfg('python', platform)
 
     def generate_rewrapper_cfg(self, tool, host_os):
         # Load Chromium config for linux remote.
@@ -299,9 +297,11 @@ class ReclientConfigurator:
 
         # Merge with our configs.
         source_cfg_paths = [
+            f'{Paths.script_dir}/{tool}/rewrapper_base_large.cfg',
             f'{Paths.script_dir}/{tool}/rewrapper_{host_os}_large.cfg',
         ]
-        rewrapper_cfg['platform=Pool'] = self.args.large_pool_name
+        if self.args.large_pool_name:
+            rewrapper_cfg['platform']['pool'] = self.args.large_pool_name
         for source_cfg_path in source_cfg_paths:
             rewrapper_cfg = ReclientCfg.merge_cfg(rewrapper_cfg,
                                                   source_cfg_path)

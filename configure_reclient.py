@@ -305,7 +305,11 @@ class ReclientConfigurator:
         for source_cfg_path in source_cfg_paths:
             rewrapper_cfg = ReclientCfg.merge_cfg(rewrapper_cfg,
                                                   source_cfg_path)
-
+        # Launch a custom merge step if it exists.
+        if self.custom_py and 'merge_rewrapper_large_cfg' in self.custom_py:
+            rewrapper_cfg = self.custom_py['merge_rewrapper_large_cfg'](rewrapper_cfg,
+                                                                        tool, host_os)
+            source_cfg_paths.append(Paths.custom_py)
         # Write the final config to the expected location.
         if self.args.verbose:
             print(f'Writing {Paths.reclient_cfgs_dir}/{tool}/rewrapper_{host_os}_large.cfg')

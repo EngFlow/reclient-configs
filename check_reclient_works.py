@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import argparse
+import os
 import subprocess
 import sys
 import tempfile
@@ -52,12 +53,14 @@ def parse_args():
 
 
 def check_reclient_works():
+    env = dict(os.environ)
+    env['RBE_server_address'] = '127.0.0.1:8000'
     print('Starting reproxy')
     subprocess.check_call([
         f'{Paths.reclient_dir}/bootstrap',
         '--cfg',
         f'{Paths.reclient_cfgs_dir}/reproxy.cfg',
-    ])
+    ], env=env)
     try:
         with tempfile.TemporaryDirectory() as tmp_dir:
             print('Remotely executing "echo hello > hello"')
@@ -67,7 +70,7 @@ def check_reclient_works():
                 f'--platform=container-image={DOCKER_IMAGE},OSFamily=linux',
                 '--output_files=hello',
                 '/bin/bash', '-c', 'echo hello > hello',
-            ], cwd=tmp_dir)
+            ], cwd=tmp_dir, env=env)
             with open(f'{tmp_dir}/hello') as f:
                 result = f.read()
                 if result == 'hello\n':
@@ -83,7 +86,7 @@ def check_reclient_works():
             '--cfg',
             f'{Paths.reclient_cfgs_dir}/reproxy.cfg',
             '--shutdown',
-        ])
+        ], env=env)
 
 
 if __name__ == '__main__':

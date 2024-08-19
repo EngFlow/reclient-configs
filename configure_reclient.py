@@ -249,7 +249,7 @@ class ReclientConfigurator:
                                   reproxy_cfg, source_cfg_paths)
 
     def generate_rewrapper_cfgs(self):
-        for tool in ['chromium-browser-clang', 'python', 'nacl']:
+        for tool in ['chromium-browser-clang', 'python']:
             for platform in ['linux', 'mac', 'windows']:
                 self.generate_rewrapper_cfg(tool, platform)
         

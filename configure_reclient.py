@@ -93,12 +93,15 @@ def parse_args():
     )
     parser.add_argument(
         '--default_pool_name',
-        help=('The remote pool name to run actions on.'),
+        help=('The remote pool name to run actions on. If unspecified, uses '
+              ' the remote\'s default pool.'),
         default='',
     )
     parser.add_argument(
         '--large_pool_name',
-        help=('The remote pool name to run large actions on.'),
+        help=('The remote pool name to run large actions on. If unspecified, '
+              'uses the pool specified with --default_pool_name, or else the '
+              'remote\'s default pool.'),
         default='',
     )
 

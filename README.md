@@ -168,5 +168,10 @@ You can define the name of the large pool by passing the following flag when run
 python3 configure_reclient.py --large_pool_name=<NAME_OF_LARGE_POOL>
 ```
 
-By default, these actions will use the default worker pool, same as other actions. In particular, if
-setting `--default_pool_name`, large actions will also be run on that pool.
+Thus, large actions are run on the following pool:
+
+- If `--large_pool_name` is set, on the pool with the specified name.
+- If `--large_pool_name` is not set and `--default_pool_name` is set, on the pool with the specified
+    name.
+- If neither `--large_pool_name` nor `--default_pool_name` are set, on the remote's default pool,
+    i.e., the pool used when actions do not request being run on a specific pool.

@@ -92,6 +92,11 @@ def parse_args():
         action='store_true',
     )
     parser.add_argument(
+        '--default_pool_name',
+        help=('The remote pool name to run actions on.'),
+        default='',
+    )
+    parser.add_argument(
         '--large_pool_name',
         help=('The remote pool name to run large actions on.'),
         default='',
@@ -270,6 +275,8 @@ class ReclientConfigurator:
             f'{Paths.script_dir}/{tool}/rewrapper_{host_os}.cfg',
         ]
 
+        if self.args.default_pool_name:
+            rewrapper_cfg['platform']['Pool'] = self.args.default_pool_name
         for source_cfg_path in source_cfg_paths:
             rewrapper_cfg = ReclientCfg.merge_cfg(rewrapper_cfg,
                                                   source_cfg_path)
@@ -302,6 +309,8 @@ class ReclientConfigurator:
         ]
         if self.args.large_pool_name:
             rewrapper_cfg['platform']['Pool'] = self.args.large_pool_name
+        elif self.args.default_pool_name:
+            rewrapper_cfg['platform']['Pool'] = self.args.default_pool_name
         for source_cfg_path in source_cfg_paths:
             rewrapper_cfg = ReclientCfg.merge_cfg(rewrapper_cfg,
                                                   source_cfg_path)

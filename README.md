@@ -144,7 +144,18 @@ def post_configure():
     pass
 ```
 
-### Define large pool
+### Define pools to run on
+
+#### Define default pool
+
+By default, actions will not specify which pool to run on, so they will be run on the default worker
+pool. You can customize the name of the pool to run actions on as follows:
+
+```
+python3 configure_reclient.py --default_pool_name=<NAME_OF_DEFAULT_POOL>
+```
+
+#### Define large pool
 
 Chromium now supports running actions on a different worker pool that might otherwise run into
 an OOM. See [Reclient](https://source.chromium.org/chromium/chromium/src/+/4f94ce92c8c657cbfeb4dd386581340704c9dd11).
@@ -157,4 +168,5 @@ You can define the name of the large pool by passing the following flag when run
 python3 configure_reclient.py --large_pool_name=<NAME_OF_LARGE_POOL>
 ```
 
-By default, these actions will use the default worker pool, same as other actions.
+By default, these actions will use the default worker pool, same as other actions. In particular, if
+setting `--default_pool_name`, large actions will also be run on that pool.

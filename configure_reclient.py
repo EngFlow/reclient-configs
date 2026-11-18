@@ -128,7 +128,12 @@ class ReclientConfigurator:
             self.generate_clang_remote_wrapper()
 
         # Reproxy config includes auth and network-related parameters.
-        self.generate_reproxy_cfg()
+        # Chromium removed reproxy along with buildtools/reclient
+        # (crrev.com/c/8667768), so nothing would read the file.
+        if os.path.isdir(Paths.reclient_dir):
+            self.generate_reproxy_cfg()
+        elif self.args.verbose:
+            print(f'Skipping reproxy.cfg: {Paths.reclient_dir} not found')
         # Rewrapper configs describe how different tools should be run remotely.
         self.generate_rewrapper_cfgs()
 

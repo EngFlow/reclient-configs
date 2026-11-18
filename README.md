@@ -21,7 +21,8 @@ python3 configure_reclient.py --help
 
 1. If a host machine is not linux, download linux clang toolchain and generate
    `clang_remote_wrapper`.
-2. Generate reproxy and rewrapper configs.
+2. Generate reproxy and rewrapper configs. Reproxy config is skipped if
+   `//buildtools/reclient` doesn't exist (removed in crrev.com/c/8667768).
 
 #### Reproxy config merge
 
